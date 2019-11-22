@@ -1,0 +1,130 @@
+---
+title: "Milestone 8"
+author: "Margaret Butler"
+date: "11/21/2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+library(gutenbergr)
+library(tidyverse)
+library(stringr)
+library(fs)
+library(scales)
+library(lubridate)
+library(dplyr)
+library(knitr)
+library(tibble)
+library(foreign)
+library(readr)
+library(janitor)
+library(tibble)
+library(purrr)
+library(ggplot2)
+library(ggrepel)
+library(tidytext)
+
+## load packages
+
+```
+## Looking at Gothic Literature
+
+Downloading books I want to look at from the gutenbergr package. Books I am looking at in this are *Frankenstein*, *The Strange Case of Dr. Jekyll and Mr. Hyde*, *Carmilla*, *The Phantom of the Opera*, and *Dracula*.
+
+## Gutenberg Book ID Numbers
+
+1. Frankenstein 84
+2. The Strange Case of Dr. Jekyll and Mr. Hyde 43
+3. Carmilla 10007
+4. The Phantom of the Opera 175
+5. Dracula 345
+
+```{r, inclue=FALSE, message=FALSE}
+
+gothic <- gutenberg_download(c(84, 43, 10007, 175, 345))
+
+frankenstein <- gutenberg_download(84)
+jekyllhyde <- gutenberg_download(43)
+carmilla <- gutenberg_download(10007)
+phantom <- gutenberg_download(175)
+dracula <- gutenberg_download(345)
+
+## downloading the books into one big data set and then into separate data sets
+
+tidy_gothic <- gothic %>%
+  unnest_tokens(word, text) %>%
+  anti_join(stop_words)
+
+tidy_frankenstein <- frankenstein %>%
+  unnest_tokens(word, text) %>%
+  anti_join(stop_words)
+
+tidy_jekyllhyde <- jekyllhyde %>%
+  unnest_tokens(word, text) %>%
+  anti_join(stop_words)
+
+tidy_carmilla <- carmilla %>%
+  unnest_tokens(word, text) %>%
+  anti_join(stop_words)
+
+tidy_phantom <- phantom %>%
+  unnest_tokens(word, text) %>%
+  anti_join(stop_words)
+
+tidy_dracula <- dracula %>%
+  unnest_tokens(word, text) %>%
+  anti_join(stop_words)
+
+## tidying words so I can pick through them at my leisure
+
+```
+
+New R chunk so that I dont have to reload the data as I play with it
+
+```{r}
+
+tidy_gothic %>% 
+  count(word, sort = TRUE)
+  
+## checking the most common words across all five texts
+
+```
+
+*The Phantom of the Opera* skews the data because Christine and Raoul are in the top ten most frequent words! Moving on to look at each book individually.
+
+Have just discovered that gutenbergr does not count pronouns or articles in its word count which is tragic because I want to look at pronoun usage!!
+
+```{r}
+
+tidy_frankenstein %>% 
+   count(word, sort = TRUE)
+
+tidy_jekyllhyde %>% 
+  count(word, sort = TRUE)
+
+tidy_carmilla %>% 
+  count(word, sort = TRUE)
+
+tidy_dracula %>% 
+  count(word, sort = TRUE)
+
+tidy_phantom %>% 
+  count(word, sort = TRUE)
+
+```
+
+Time is in the top ten for all of them except for in Jekyll and Hyde.
+
+```{r}
+
+dir_create("gothic_app")
+
+write_rds(tidy_gothic, "gothic_app/tidy_gothic.rds")
+
+## made dirctory for gothic shiny app and made file to use in said shiny app
+
+```
+
+
